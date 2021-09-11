@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+
+
+<div class="example-wrapper m-auto" style="width : 80%">
+    <form method="POST" action="/update/{{id}}">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{array.name}}">
+        </div>
+        <div class="form-group">
+            <label for="descri">Description</label>
+            <input type="text" class="form-control" id="descri" name="descri" value="{{array.description}}">
+        </div>
+        <div class="form-group">
+            {% for user in array.users %}
+                <label for="usrname{{ loop.index }}">User Name {{ loop.index }}</label>
+                <input type="text" class="form-control" id="usrname{{ loop.index }}" name="usrname{{ loop.index }}" value="{{user.name}}">
+            {% endfor %}
+        </div>
+            <div class="form-group">
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+{% endblock %}

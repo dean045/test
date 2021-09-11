@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+
+
+<div class="example-wrapper">
+    <table class="table m-auto" style="width : 80%">
+        <thead>
+            <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Users</th>
+            <th scope="col">#</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for org in array %}
+                <tr>
+                <td>{{org.name}}</td>
+                <td>{{org.description}}</td>
+                <td>{% for user in org.users %} {{user.name}}; {% endfor %}    </td>
+                <td><a type="button" class="btn btn-primary" href="/edit/{{loop.index}}" >EDIT</a><a type="button" class="btn btn-danger" href="/delete/{{loop.index}}" >Delete</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-center mx-auto my-5">
+        <a type="button" class="btn btn-primary center" href="/getadd/" >Add organization</a>
+    </div>
+</div>
+{% endblock %}

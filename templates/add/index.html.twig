@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+<div class="example-wrapper m-auto" style="width : 80%">
+    <form method="POST" action="/add">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" >
+        </div>
+        <div class="form-group">
+            <label for="descri">Description</label>
+            <input type="text" class="form-control" id="descri" name="descri">
+        </div>
+        <div id="list" class="form-group">
+            <button onclick="adduser()" type="button">Add user</button>
+            
+        </div>
+            <div class="form-group">
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
+<script>
+    i = -1;
+    function adduser()
+    {
+        var div = document.createElement("div");
+        div.class= "form-group";
+        var label = document.createElement("label");
+        label.innerHTML = "User Name ";
+        var input = document.createElement("input");
+        input.className = "form-control";
+        input.type = "text";
+        input.id = "username"+ (++i);
+        input.name = "username"+ (i);
+        div.appendChild(label);
+        div.appendChild(input);
+        document.getElementById("list").appendChild(div);
+
+    }
+</script>
+{% endblock %}
