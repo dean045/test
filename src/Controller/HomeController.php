@@ -108,8 +108,9 @@ class HomeController extends AbstractController
      */
     public function delete(Request $request, $id): Response
     {
+        $id--;
         $array = Yaml::parseFile($this->getParameter('kernel.project_dir') . '/content/organizations.yaml');
-        array_splice($array['organizations'], $id - 1, $id - 1);
+        array_splice($array['organizations'], $id, $id+1);
         $yaml = Yaml::dump($array);
         file_put_contents($this->getParameter('kernel.project_dir') . '/content/organizations.yaml', $yaml);
         return $this->redirectToRoute('home');
