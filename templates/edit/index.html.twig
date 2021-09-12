@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}modification organizations!{% endblock %}
 
 {% block body %}
 
@@ -18,12 +18,17 @@
         <div class="form-group">
             {% for user in array.users %}
                 <label for="usrname{{ loop.index }}">User Name {{ loop.index }}</label>
-                <input type="text" class="form-control" id="usrname{{ loop.index }}" name="usrname{{ loop.index }}" value="{{user.name}}">
+                <div>
+                    <input type="text" class="form-control" id="usrname{{ loop.index }}" name="usrname{{ loop.index }}" value="{{user.name}}">
+                    <a type="button" class="btn btn-danger" href="/deleteuser/{{id}}/{{loop.index}}" >Delete</a>
+                </div>
+                
             {% endfor %}
         </div>
-            <div class="form-group">
-            <input type="submit" value="Submit">
-        </div>
+            <div class="form-group my-2">
+                <input type="submit" class="btn btn-primary center" value="Submit">
+                <a type="button" class="btn btn-danger" href="/" >Return back</a>
+            </div>
     </form>
 </div>
 {% endblock %}

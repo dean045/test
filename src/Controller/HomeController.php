@@ -45,11 +45,11 @@ class HomeController extends AbstractController
         $array = Yaml::parseFile($this->getParameter('kernel.project_dir') . '/content/organizations.yaml');
         $array['organizations'][$id]['name'] = $request->request->get('name');
         $array['organizations'][$id]['description'] = $request->request->get('descri');
-        $i = -1;
-        while (++$i < count($array['organizations'][$id]['users']))
+        $i = 0;
+        while (++$i <= count($array['organizations'][$id]['users']))
         {
             if($request->request->get('usrname'. $i))
-                $array['organizations'][$id]['users'][$i]['name'] = $request->request->get('usrname'.$i);
+                $array['organizations'][$id]['users'][$i-1]['name'] = $request->request->get('usrname'.$i);
         }
         $yaml = Yaml::dump($array);
 
@@ -131,5 +131,38 @@ class HomeController extends AbstractController
         $yaml = Yaml::dump($array);
         file_put_contents($this->getParameter('kernel.project_dir') . '/content/organizations.yaml', $yaml);
         return $this->redirectToRoute('home');
+    }
+    /**
+     * @Route("/deleteuser/{id}/{user}/", name="delete")
+     */
+    public function delete_user(Request $request, $id, $user): Response
+    {
+        $user--;
+        $i = 0;
+        $y = 0;
+        $array = Yaml::parseFile($this->getParameter('kernel.project_dir') . '/content/organizations.yaml');
+        //array_splice($array['organizations'], $id, $id);
+        //dd($array['organizations'][$id]);
+        $temp = null;
+        while($i < count($array['organizations'][$id]['users']) && $y < count($array['organizations'][$id]['users']))
+        {
+            //dd($id, $i, $y);
+            if($y != $user)
+            {
+                $temp[$i] = $array['organizations'][$id]['users'][$y];
+                $y++;
+                $i++;
+            }
+            else
+                $y++;
+        }
+        $array['organizations'][$id]['users'] = $temp;
+        $yaml = Yaml::dump($array);
+        file_put_contents($this->getParameter('kernel.project_dir') . '/content/organizations.yaml', $yaml);
+        return $this->render('edit/index.html.twig', [
+            'controller_name' => 'HomeController',
+            'array' => $array['organizations'][$id],
+            'id' => $id
+        ]);
     }
 }
