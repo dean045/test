@@ -25,9 +25,9 @@
                 {% for user in array.users %}
                 <div class="row">
                     <div class="mt-2 col-6">
-                        <input type="text" class="form-control mt-2" id="username{{ loop.index -1}}" name="username{{ loop.index -1}}" value="{{user.name}}">
-                        <input type="text" class="form-control mt-2" id="password{{ loop.index -1}}" name="password{{ loop.index -1}}" value="{{user.password}}">
-                        <input type="text" class="form-control mt-2" id="role{{ loop.index -1}}" name="role{{ loop.index -1}}" value="{{user.role|join(';')}}">
+                        <input type="text" class="form-control mt-2" id="username{{ loop.index}}" name="username{{ loop.index}}" value="{{user.name}}">
+                        <input type="text" class="form-control mt-2" id="password{{ loop.index }}" name="password{{ loop.index}}" value="{{user.password}}">
+                        <input type="text" class="form-control mt-2" id="role{{ loop.index}}" name="role{{ loop.index}}" value="{{user.role|join(';')}}">
                     </div>
                     <div class="col-4 m-auto">
                         <input class="form-check-input mx-auto" type="checkbox" name="check[]" value="{{loop.index}}">
@@ -46,12 +46,11 @@
 
 <script>
     var i = 1;
-    
+    while(document.getElementById("username" + i))
+        i++;
+
     function adduser()
     {
-        while (document.getElementById("username"+i))
-            i++;
-
         var divGlobal = document.createElement("div");
         divGlobal.className= "row";
         divGlobal.id = "divGlobal";
@@ -96,7 +95,7 @@
         divGlobal.appendChild(div);
         divGlobal.appendChild(divcheck);
         document.getElementById("list").appendChild(divGlobal);
-
+        i++;
     }
 </script>
 {% endblock %}

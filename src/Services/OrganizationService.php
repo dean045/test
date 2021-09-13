@@ -26,12 +26,12 @@ class OrganizationService
 
 	public function Edit($id, Request $request, $dir) {
 		$users = [];
-        $i = -1;
+        $i = 0;
 		$checkboxes = $request->request->get('check');
 
         while ($request->request->get('username'. ++$i))
         {
-			if(!$checkboxes || !in_array($i+1, $checkboxes))
+			if(!$checkboxes || !in_array($i, $checkboxes))
 			{
 				$user = new User(strip_tags($request->request->get('username'.$i)), 
 					strip_tags($request->request->get('password'.$i)), 
