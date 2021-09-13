@@ -13,12 +13,13 @@
             <label for="descri">Description</label>
             <input type="text" class="form-control" id="descri" name="descri">
         </div>
-        <div id="list" class="form-group">
-            <button onclick="adduser()" type="button">Add user</button>
+        <div id="list" class="form-group mt-2">
+            <button onclick="adduser()" type="button" class="btn btn-primary">Add user</button>
             
         </div>
-            <div class="form-group">
-            <input type="submit" value="Submit">
+            <div class="form-group mt-2 ">
+            <input type="submit" class="btn btn-primary" value="Submit">
+            <a type="button" class="btn btn-danger" href="/" >Return back</a>
         </div>
     </form>
 </div>
@@ -28,16 +29,33 @@
     function adduser()
     {
         var div = document.createElement("div");
-        div.class= "form-group";
+        div.class= "form-group mt-2";
         var label = document.createElement("label");
-        label.innerHTML = "User Name ";
+        label.innerHTML = "User " + (++i);
         var input = document.createElement("input");
-        input.className = "form-control";
+        input.className = "form-control mt-2";
         input.type = "text";
-        input.id = "username"+ (++i);
+        input.required = "true";
+        input.id = "username"+ (i);
         input.name = "username"+ (i);
+        input.placeholder = "Username";
+        var input2 = document.createElement("input");
+        input2.className = "form-control mt-2";
+        input2.type = "text";
+        input2.id = "password"+ (i);
+        input2.name = "password"+ (i);
+        input2.placeholder = "Password";
+        var input3 = document.createElement("input");
+        input3.className = "form-control mt-2";
+        input3.type = "text";
+        input3.id = "role"+ (i);
+        input3.name = "role"+ (i);
+        input3.placeholder = "Role";
+
         div.appendChild(label);
         div.appendChild(input);
+        div.appendChild(input2);
+        div.appendChild(input3);
         document.getElementById("list").appendChild(div);
 
     }

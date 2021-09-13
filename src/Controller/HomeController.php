@@ -7,53 +7,55 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Yaml\Yaml;
+use App\Entity\Organization;
+use App\Services\OrganizationService;
+use App\Entity\User;
+
 
 class HomeController extends AbstractController
 {
     /**
      * @Route("/", name="home")
      */
-    public function index(): Response
+    public function index(OrganizationService $service): Response
     {
-        $array = Yaml::parseFile($this->getParameter('kernel.project_dir') . '/content/organizations.yaml');
-        //dd($array['organizations']);
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
-            'array' => $array['organizations']
+            'array' => $service->getAll($this->getParameter('kernel.project_dir'))
         ]);
     }
 
     /**
      * @Route("/edit/{id}", name="edit")
      */
-    public function getform(Request $request, $id): Response
+    public function getform(Request $request, $id, OrganizationService $service): Response
     {
-        $array = Yaml::parseFile($this->getParameter('kernel.project_dir') . '/content/organizations.yaml');
-        //dd($array['organizations'][$id]);
         return $this->render('edit/index.html.twig', [
             'controller_name' => 'HomeController',
-            'array' => $array['organizations'][--$id],
-            'id' => $id
+            'id' => $id,
+            'array' => $service->getById(--$id, $this->getParameter('kernel.project_dir'))
         ]);
     }
 
     /**
      * @Route("/update/{id}", name="update")
      */
-    public function update(Request $request, $id): Response
+    public function update(Request $request, $id, OrganizationService $service): Response
     {
-        $array = Yaml::parseFile($this->getParameter('kernel.project_dir') . '/content/organizations.yaml');
-        $array['organizations'][$id]['name'] = $request->request->get('name');
-        $array['organizations'][$id]['description'] = $request->request->get('descri');
-        $i = 0;
-        while (++$i <= count($array['organizations'][$id]['users']))
+        $users = [];
+        $i = -1;
+        while ($request->request->get('username'.++$i))
         {
-            if($request->request->get('usrname'. $i))
-                $array['organizations'][$id]['users'][$i-1]['name'] = $request->request->get('usrname'.$i);
+            $user = new User(strip_tags($request->request->get('username'.$i)), 
+                strip_tags($request->request->get('password'.$i)), 
+                explode(';', strip_tags($request->request->get('role'.$i))));
+            //dd($user);
+            array_push($users, $user->to_array());
         }
-        $yaml = Yaml::dump($array);
+        $org = new Organization(strip_tags($request->request->get('name')),
+            strip_tags($request->request->get('descri')), $users);
 
-        file_put_contents($this->getParameter('kernel.project_dir') . '/content/organizations.yaml', $yaml);
+        $service->Edit(--$id, $org->to_array(), $this->getParameter('kernel.project_dir'));
         return $this->redirectToRoute('home');
     }
 
@@ -62,106 +64,66 @@ class HomeController extends AbstractController
      */
     public function getadd(Request $request): Response
     {
-        $array = Yaml::parseFile($this->getParameter('kernel.project_dir') . '/content/organizations.yaml');
         return $this->render('add/index.html.twig', [
-            'controller_name' => 'HomeController',
-            'array' => $array['organizations']
+            'controller_name' => 'HomeController'
         ]);
     }
+
     /**
      * @Route("/add/", name="add")
      */
-    public function add(Request $request): Response
+    public function add(Request $request, OrganizationService $service): Response
     {
-        $array = Yaml::parseFile($this->getParameter('kernel.project_dir') . '/content/organizations.yaml');
+        $users = [];
         $i = -1;
-        $users = null;
-        if( $request->request->get('username'. ++ $i))
-        {
-            $users = array(
-                $i => array(
-                "name" => $request->request->get('username'. $i),
-                "password" => "empty",
-                "role" => array("empty"))
-                );
-            while( $request->request->get('username'. ++ $i))
-            {
-                array_push($users, array(
-                    "name" => $request->request->get('username'. $i),
-                    "password" => "empty",
-                    "role" => array("empty")));
-            }
+        while ($request->request->get('username'. ++$i))
+        { 
+            $user = new User(strip_tags($request->request->get('username'.$i)), 
+                strip_tags($request->request->get('password'.$i)), 
+                explode(';', strip_tags($request->request->get('role'.$i))));
+            array_push($users, $user->to_array());
         }
-        $new = array (
-            "name" => $request->request->get('name'),
-            "description" => $request->request->get('descri'),
-            "users" => $users
-        );
-        array_push($array['organizations'], $new);
-        $yaml = Yaml::dump($array);
+        $org = new Organization(strip_tags($request->request->get('name')), strip_tags($request->request->get('descri')),$users);
+        $service->Add($org, $this->getParameter('kernel.project_dir'));
 
-        file_put_contents($this->getParameter('kernel.project_dir') . '/content/organizations.yaml', $yaml);
         return $this->redirectToRoute('home');
     }
+
     /**
      * @Route("/delete/{id}", name="delete")
      */
-    public function delete(Request $request, $id): Response
+    public function delete(Request $request, $id, OrganizationService $service): Response
     {
-        $id--;
-        $y = 0;
-        $i = 0;
-        $array = Yaml::parseFile($this->getParameter('kernel.project_dir') . '/content/organizations.yaml');
-        //array_splice($array['organizations'], $id, $id);
-        
-        $temp = null;
-        while($i < count($array['organizations']) - 1 && $y < count($array['organizations']))
-        {
-            //dd($id, $i, $y);
-            if($y != $id)
-            {
-                $temp[$i] = $array['organizations'][$y];
-                $y++;
-                $i++;
-            }
-            else
-                $y++;
-        }
-        $array['organizations'] = $temp;
-        $yaml = Yaml::dump($array);
-        file_put_contents($this->getParameter('kernel.project_dir') . '/content/organizations.yaml', $yaml);
+        $service->Delete($id - 1, $this->getParameter('kernel.project_dir'));
         return $this->redirectToRoute('home');
     }
+
     /**
-     * @Route("/deleteuser/{id}/{user}/", name="delete")
+     * @Route("/deleteuser/{id}/{user}/", name="deleteuser")
      */
-    public function delete_user(Request $request, $id, $user): Response
+    public function delete_user(Request $request, $id, $user, OrganizationService $service): Response
     {
         $user--;
         $i = 0;
         $y = 0;
-        $array = Yaml::parseFile($this->getParameter('kernel.project_dir') . '/content/organizations.yaml');
-        //array_splice($array['organizations'], $id, $id);
-        //dd($array['organizations'][$id]);
+        $org = $service->getById($id, $this->getParameter('kernel.project_dir'));
         $temp = null;
-        while($i < count($array['organizations'][$id]['users']) && $y < count($array['organizations'][$id]['users']))
+        while($i < count($org['users']) && $y < count($org['users']))
         {
-            //dd($id, $i, $y);
             if($y != $user)
             {
-                $temp[$i] = $array['organizations'][$id]['users'][$y];
+                $temp[$i] = $org['users'][$y];
                 $y++;
                 $i++;
             }
             else
                 $y++;
         }
-        $array['organizations'][$id]['users'] = $temp;
-        $yaml = Yaml::dump($array);
-        file_put_contents($this->getParameter('kernel.project_dir') . '/content/organizations.yaml', $yaml);
+        $org['users'] = $temp;
+        $service->Edit(--$id, $org, $this->getParameter('kernel.project_dir'));
         return $this->render('edit/index.html.twig', [
             'controller_name' => 'HomeController',
-            'array' => $array['organizations'][$id],
+            'array' => $org,
             'id' => $id
         ]);
     }

@@ -16,14 +16,18 @@
             <input type="text" class="form-control" id="descri" name="descri" value="{{array.description}}">
         </div>
         <div class="form-group">
-            {% for user in array.users %}
-                <label for="usrname{{ loop.index }}">User Name {{ loop.index }}</label>
-                <div>
-                    <input type="text" class="form-control" id="usrname{{ loop.index }}" name="usrname{{ loop.index }}" value="{{user.name}}">
-                    <a type="button" class="btn btn-danger" href="/deleteuser/{{id}}/{{loop.index}}" >Delete</a>
-                </div>
-                
-            {% endfor %}
+            <button onclick="adduser()" type="button" class="btn btn-primary">Add user</button>
+            <div id="list" class="form-group mt-2">
+                {% for user in array.users %}
+                    <label class="mt-2" for="username{{ loop.index }}">User Name {{ loop.index -1}}</label>
+                    <div>
+                        <input type="text" class="form-control mt-2" id="username{{ loop.index -1}}" name="username{{ loop.index -1}}" value="{{user.name}}">
+                        <input type="text" class="form-control mt-2" id="password{{ loop.index -1}}" name="password{{ loop.index -1}}" value="{{user.password}}">
+                        <input type="text" class="form-control mt-2" id="role{{ loop.index -1}}" name="role{{ loop.index -1}}" value="{{user.role|join(';')}}">
+                        <a type="button" class="btn btn-danger mt-2" href="/deleteuser/{{id}}/{{loop.index}}" >Delete</a>
+                    </div> 
+                {% endfor %}
+            </div>
         </div>
             <div class="form-group my-2">
                 <input type="submit" class="btn btn-primary center" value="Submit">
@@ -31,4 +35,42 @@
             </div>
     </form>
 </div>
+
+
+<script>
+    i = -1;
+    function adduser()
+    {
+        var div = document.createElement("div");
+        div.class= "form-group mt-2";
+        var label = document.createElement("label");
+        label.innerHTML = "User " + (++i);
+        var input = document.createElement("input");
+        input.className = "form-control mt-2";
+        input.type = "text";
+        input.required = "true";
+        input.id = "username"+ (i);
+        input.name = "username"+ (i);
+        input.placeholder = "Username";
+        var input2 = document.createElement("input");
+        input2.className = "form-control mt-2";
+        input2.type = "text";
+        input2.id = "password"+ (i);
+        input2.name = "password"+ (i);
+        input2.placeholder = "Password";
+        var input3 = document.createElement("input");
+        input3.className = "form-control mt-2";
+        input3.type = "text";
+        input3.id = "role"+ (i);
+        input3.name = "role"+ (i);
+        input3.placeholder = "Role";
+
+        div.appendChild(label);
+        div.appendChild(input);
+        div.appendChild(input2);
+        div.appendChild(input3);
+        document.getElementById("list").appendChild(div);
+
+    }
+</script>
 {% endblock %}
