@@ -18,14 +18,21 @@
         <div class="form-group">
             <button onclick="adduser()" type="button" class="btn btn-primary">Add user</button>
             <div id="list" class="form-group mt-2">
+                <div class="row">
+                    <p class="mt-2 col-6 text-center">Users</p>
+                    <p class="mt-2 col-6">Check to delete user</p>
+                </div>
                 {% for user in array.users %}
-                    <label class="mt-2" for="username{{ loop.index }}">User Name {{ loop.index -1}}</label>
-                    <div>
+                <div class="row">
+                    <div class="mt-2 col-6">
                         <input type="text" class="form-control mt-2" id="username{{ loop.index -1}}" name="username{{ loop.index -1}}" value="{{user.name}}">
                         <input type="text" class="form-control mt-2" id="password{{ loop.index -1}}" name="password{{ loop.index -1}}" value="{{user.password}}">
                         <input type="text" class="form-control mt-2" id="role{{ loop.index -1}}" name="role{{ loop.index -1}}" value="{{user.role|join(';')}}">
-                        <a type="button" class="btn btn-danger mt-2" href="/deleteuser/{{id}}/{{loop.index}}" >Delete</a>
-                    </div> 
+                    </div>
+                    <div class="col-4 m-auto">
+                        <input class="form-check-input mx-auto" type="checkbox" name="check[]" value="{{loop.index}}">
+                    </div>
+                </div>
                 {% endfor %}
             </div>
         </div>
@@ -38,13 +45,19 @@
 
 
 <script>
-    i = -1;
+    var i = 1;
+    
     function adduser()
     {
+        while (document.getElementById("username"+i))
+            i++;
+
+        var divGlobal = document.createElement("div");
+        divGlobal.className= "row";
+        divGlobal.id = "divGlobal";
+
         var div = document.createElement("div");
-        div.class= "form-group mt-2";
-        var label = document.createElement("label");
-        label.innerHTML = "User " + (++i);
+        div.className= "mt-2 col-6";
         var input = document.createElement("input");
         input.className = "form-control mt-2";
         input.type = "text";
@@ -65,11 +78,24 @@
         input3.name = "role"+ (i);
         input3.placeholder = "Role";
 
-        div.appendChild(label);
+        var divcheck = document.createElement("div");
+        divcheck.className= "col-4 m-auto";
+
+        var inputcheck = document.createElement("input");
+        inputcheck.className = "form-check-input mx-auto";
+        inputcheck.type = "checkbox";
+        inputcheck.value = i;
+
         div.appendChild(input);
         div.appendChild(input2);
         div.appendChild(input3);
-        document.getElementById("list").appendChild(div);
+
+        divcheck.appendChild(inputcheck);
+
+        
+        divGlobal.appendChild(div);
+        divGlobal.appendChild(divcheck);
+        document.getElementById("list").appendChild(divGlobal);
 
     }
 </script>

@@ -2,6 +2,9 @@
 
 namespace App\Services;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Organization;
+use App\Entity\User;
 
 class OrganizationService
 {
@@ -21,15 +24,44 @@ class OrganizationService
 		return $organizations[$id];
 	}
 
-	public function Edit($id, $organization, $dir) {
+	public function Edit($id, Request $request, $dir) {
+		$users = [];
+        $i = -1;
+		$checkboxes = $request->request->get('check');
+
+        while ($request->request->get('username'. ++$i))
+        {
+			if(!$checkboxes || !in_array($i+1, $checkboxes))
+			{
+				$user = new User(strip_tags($request->request->get('username'.$i)), 
+					strip_tags($request->request->get('password'.$i)), 
+					explode(';', strip_tags($request->request->get('role'.$i))));
+				//dd($user);
+				array_push($users, $user->to_array());
+			}
+        }
+        $org = new Organization(strip_tags($request->request->get('name')),
+            strip_tags($request->request->get('descri')), $users);
         $organizations = $this->getAll($dir);
-		$organizations[$id] = $organization;
+		$organizations[$id] = $org->to_array();
 		$this->save($organizations, $dir);
+		//dd($organizations);
 	}
 
-	public function Add($organization, $dir) {
+	public function Add(Request $request, $dir) {
+		$users = [];
+        $i = -1;
+        while ($request->request->get('username'. ++$i))
+        {
+
+			$user = new User(strip_tags($request->request->get('username'.$i)), 
+				strip_tags($request->request->get('password'.$i)), 
+				explode(';', strip_tags($request->request->get('role'.$i))));
+			array_push($users, $user->to_array());
+        }
+        $org = new Organization(strip_tags($request->request->get('name')), strip_tags($request->request->get('descri')),$users);
         $organizations = $this->getAll($dir);
-		array_push($organizations, $organization->to_array());
+		array_push($organizations, $org->to_array());
 		$this->save($organizations, $dir);
 	}
 

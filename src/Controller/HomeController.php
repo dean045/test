@@ -42,20 +42,7 @@ class HomeController extends AbstractController
      */
     public function update(Request $request, $id, OrganizationService $service): Response
     {
-        $users = [];
-        $i = -1;
-        while ($request->request->get('username'.++$i))
-        {
-            $user = new User(strip_tags($request->request->get('username'.$i)), 
-                strip_tags($request->request->get('password'.$i)), 
-                explode(';', strip_tags($request->request->get('role'.$i))));
-            //dd($user);
-            array_push($users, $user->to_array());
-        }
-        $org = new Organization(strip_tags($request->request->get('name')),
-            strip_tags($request->request->get('descri')), $users);
-
-        $service->Edit(--$id, $org->to_array(), $this->getParameter('kernel.project_dir'));
+        $service->Edit(--$id, $request, $this->getParameter('kernel.project_dir'));
         return $this->redirectToRoute('home');
     }
 
@@ -74,18 +61,7 @@ class HomeController extends AbstractController
      */
     public function add(Request $request, OrganizationService $service): Response
     {
-        $users = [];
-        $i = -1;
-        while ($request->request->get('username'. ++$i))
-        { 
-            $user = new User(strip_tags($request->request->get('username'.$i)), 
-                strip_tags($request->request->get('password'.$i)), 
-                explode(';', strip_tags($request->request->get('role'.$i))));
-            array_push($users, $user->to_array());
-        }
-        $org = new Organization(strip_tags($request->request->get('name')), strip_tags($request->request->get('descri')),$users);
-        $service->Add($org, $this->getParameter('kernel.project_dir'));
-
+        $service->add($request, $this->getParameter('kernel.project_dir'));
         return $this->redirectToRoute('home');
     }
 
@@ -96,35 +72,5 @@ class HomeController extends AbstractController
     {
         $service->Delete($id - 1, $this->getParameter('kernel.project_dir'));
         return $this->redirectToRoute('home');
-    }
-
-    /**
-     * @Route("/deleteuser/{id}/{user}/", name="deleteuser")
-     */
-    public function delete_user(Request $request, $id, $user, OrganizationService $service): Response
-    {
-        $user--;
-        $i = 0;
-        $y = 0;
-        $org = $service->getById($id, $this->getParameter('kernel.project_dir'));
-        $temp = null;
-        while($i < count($org['users']) && $y < count($org['users']))
-        {
-            if($y != $user)
-            {
-                $temp[$i] = $org['users'][$y];
-                $y++;
-                $i++;
-            }
-            else
-                $y++;
-        }
-        $org['users'] = $temp;
-        $service->Edit(--$id, $org, $this->getParameter('kernel.project_dir'));
-        return $this->render('edit/index.html.twig', [
-            'controller_name' => 'HomeController',
-            'array' => $org,
-            'id' => $id
-        ]);
     }
 }
